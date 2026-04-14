@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AmberDrop Social</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root{
+      --bg1:#180d00;
+      --bg2:#2d1600;
+      --bg3:#5d2c00;
+      --card:rgba(255,255,255,.08);
+      --card2:rgba(255,255,255,.06);
+      --line:rgba(255,255,255,.12);
+      --text:#fff7eb;
+      --muted:rgba(255,247,235,.72);
+      --yellow:#ffd54a;
+      --orange:#ff8a00;
+      --orange2:#ffb84d;
+      --shadow:0 20px 60px rgba(0,0,0,.35);
+      --radius:22px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Poppins,sans-serif;
+      color:var(--text);
+      min-height:100vh;
+      background:
+        radial-gradient(circle at top left, rgba(255,213,74,.18), transparent 25%),
+        radial-gradient(circle at top right, rgba(255,138,0,.22), transparent 24%),
+        radial-gradient(circle at 50% 80%, rgba(255,184,77,.12), transparent 30%),
+        linear-gradient(135deg, #120800, #241100 36%, #5b2b00 100%);
+    }
+
+    .wrap{
+      max-width:1180px;
+      margin:0 auto;
+      padding:18px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      padding:14px 16px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.07);
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(14px);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+
+    .logo{
+      width:46px;
+      height:46px;
+      border-radius:15px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(135deg, #fff3ac, var(--yellow), var(--orange));
+      color:#3a1b00;
+      font-weight:900;
+      flex:none;
+      box-shadow:0 10px 30px rgba(255, 152, 0, .25);
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:18px;
+      line-height:1.1;
+    }
+
+    .brand p{
+      margin:3px 0 0;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .buttons{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    button{
+      border:none;
+      cursor:pointer;
+      border-radius:999px;
+      padding:11px 16px;
+      font:inherit;
+      font-weight:700;
+      transition:.2s;
+    }
+
+    button:hover{transform:translateY(-1px)}
+
+    .btn{
+      background:rgba(255,255,255,.08);
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .btn.primary{
+      background:linear-gradient(135deg, #ffe36c, var(--orange2), var(--orange));
+      color:#3a1b00;
+    }
+
+    .btn.danger{
+      background:rgba(255,107,107,.12);
+      color:#ffd8d8;
+      border:1px solid rgba(255,107,107,.25);
+    }
+
+    .btn.small{
+      padding:9px 14px;
+      font-size:13px;
+    }
+
+    .card{
+      margin-top:16px;
+      padding:20px;
+      border-radius:var(--radius);
+      background:var(--card);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(14px);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1.04fr .96fr;
+      gap:16px;
+      margin-top:16px;
+    }
+
+    .two-col{
+      display:grid;
+      grid-template-columns:360px 1fr;
+      gap:16px;
+      margin-top:16px;
+      align-items:start;
+    }
+
+    .hidden{display:none !important}
+
+    h2,h3{margin:0 0 12px}
+    p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+    }
+
+    .big-title{
+      font-size:clamp(32px,4vw,54px);
+      line-height:1.02;
+      margin-top:10px;
+      letter-spacing:-.5px;
+    }
+
+    .tag{
+      display:inline-block;
+      padding:7px 12px;
+      border-radius:999px;
+      background:rgba(255,214,90,.14);
+      border:1px solid rgba(255,214,90,.22);
+      color:#fff0bf;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    input, select, textarea{
+      width:100%;
+      margin-top:7px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(10,7,0,.35);
+      color:var(--text);
+      border-radius:16px;
+      padding:13px 14px;
+      font:inherit;
+      outline:none;
+    }
+
+    textarea{
+      min-height:130px;
+      resize:vertical;
+    }
+
+    label{
+      display:block;
+      font-size:12px;
+      font-weight:700;
+      color:#ffe9a5;
+    }
+
+    .link-box{
+      padding:14px;
+      border-radius:18px;
+      background:rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      word-break:break-all;
+      color:#ffe8b0;
+      margin-top:8px;
+      font-size:13px;
+    }
+
+    .profile-head{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin-bottom:14px;
+    }
+
+    .avatar{
+      width:64px;
+      height:64px;
+      border-radius:20px;
+      object-fit:cover;
+      background:linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.05));
+      border:1px solid rgba(255,255,255,.12);
+      display:grid;
+      place-items:center;
+      font-size:28px;
+      flex:none;
+      overflow:hidden;
+    }
+
+    .avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .subtitle{
+      font-size:12px;
+      color:var(--muted);
+      word-break:break-word;
+    }
+
+    .section-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+
+    .categories{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:14px;
+      margin-bottom:14px;
+    }
+
+    .chip{
+      border:none;
+      cursor:pointer;
+      color:var(--text);
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:700;
+      transition:.18s ease;
+    }
+
+    .chip:hover{transform:translateY(-1px)}
+    .chip.active{
+      background:linear-gradient(135deg, #ffe36c, var(--orange2), var(--orange));
+      color:#3a1b00;
+      border-color:transparent;
+    }
+
+    .feed{
+      display:grid;
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .post{
+      padding:16px;
+      border-radius:18px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+    }
+
+    .post-top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+
+    .post-user{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .post-user .avatar{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      font-size:18px;
+    }
+
+    .badge{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,214,90,.14);
+      border:1px solid rgba(255,214,90,.20);
+      color:#ffeab5;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .small{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .empty{
+      padding:24px;
+      text-align:center;
+      border-radius:18px;
+      background:rgba(255,255,255,.05);
+      border:1px dashed rgba(255,255,255,.16);
+      color:var(--muted);
+    }
+
+    .footer-note{
+      margin-top:12px;
+      font-size:12px;
+      color:rgba(255,247,235,.65);
+      line-height:1.7;
+    }
+
+    .switch{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-top:12px;
+      flex-wrap:wrap;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .switch input{
+      width:auto;
+      margin:0;
+      transform:scale(1.15);
+    }
+
+    .toolbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .mini-note{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    @media (max-width: 980px){
+      .grid, .two-col, .row{
+        grid-template-columns:1fr;
+      }
+      .buttons{
+        justify-content:stretch;
+      }
+      .btn{
+        width:100%;
+      }
+    }
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">A</div>
+        <div>
+          <h1>AmberDrop Social</h1>
+          <p>Anonymous posts, profiles, and live feed</p>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button class="btn" id="homeBtn">Home</button>
+        <button class="btn" id="feedBtn">Feed</button>
+        <button class="btn primary" id="signinBtn">Signin with google</button>
+        <button class="btn danger hidden" id="signoutBtn">Sign out</button>
+      </div>
+    </div>
+
+    <section id="homeView" class="card">
+      <span class="tag">Yellow + orange aesthetic</span>
+      <h2 class="big-title">Share your thoughts, your way.</h2>
+      <p style="margin-top:10px;">
+        Customize your profile, drop your thoughts, and choose your identity — anonymous or not. Everything flows into a clean, categorized feed.
+      </p>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Your profile</h3>
+          <div class="profile-head">
+            <div class="avatar" id="profileAvatar">A</div>
+            <div style="min-width:0;">
+              <div style="font-weight:800; font-size:18px;" id="profileName">Not signed in</div>
+              <div class="subtitle" id="profileEmail">Use Google Sign-In to start.</div>
+            </div>
+          </div>
+
+          <label>Display name</label>
+          <input id="displayNameInput" type="text" placeholder="Your name">
+
+          <label style="margin-top:12px;">Bio</label>
+          <textarea id="bioInput" placeholder="Write something about yourself..."></textarea>
+
+          <label style="margin-top:12px;">Profile picture</label>
+          <input id="photoInput" type="file" accept="image/*">
+
+          <div class="switch">
+            <input id="savePhotoAsUrl" type="checkbox">
+            <span>Use image preview as profile picture</span>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" id="saveProfileBtn">Save profile</button>
+            <button class="btn" id="copyMyLinkBtn">Copy my link</button>
+          </div>
+
+          <div style="margin-top:12px;">
+            <div class="mini-note">Your public link</div>
+            <div class="link-box" id="myLinkBox">Signin with google first.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>How it works</h3>
+          <p>1. Sign in with Google.</p>
+          <p>2. Add your name, bio, and profile picture.</p>
+          <p>3. Write a post.</p>
+          <p>4. Toggle anonymous on or off.</p>
+          <p>5. Choose a category and publish.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="feedView" class="card hidden">
+      <div class="section-title">
+        <div>
+          <h2>Feed</h2>
+          <p>See all public posts here.</p>
+        </div>
+        <div class="toolbar">
+          <button class="btn small" id="refreshBtn">Refresh</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Create a post</h3>
+
+        <label>Post text</label>
+        <textarea id="postText" placeholder="What’s on your mind?"></textarea>
+
+        <div class="row">
+          <div>
+            <label>Category</label>
+            <select id="postCategory">
+              <option>General</option>
+              <option>Update</option>
+              <option>Question</option>
+              <option>Opinion</option>
+              <option>Photo</option>
+              <option>Story</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label>Style</label>
+            <select id="postStyle">
+              <option>Normal</option>
+              <option>Funny</option>
+              <option>Serious</option>
+              <option>Supportive</option>
+              <option>Bold</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="switch">
+          <input id="anonymousCheck" type="checkbox">
+          <span>Post anonymously</span>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" id="publishBtn">Publish post</button>
+        </div>
+      </div>
+
+      <div class="categories" id="categoryTabs">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="General">General</button>
+        <button class="chip" data-filter="Update">Update</button>
+        <button class="chip" data-filter="Question">Question</button>
+        <button class="chip" data-filter="Opinion">Opinion</button>
+        <button class="chip" data-filter="Photo">Photo</button>
+        <button class="chip" data-filter="Story">Story</button>
+        <button class="chip" data-filter="Other">Other</button>
+      </div>
+
+      <div id="feedList" class="feed"></div>
+    </section>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6DhicxhHeCvDfyJ05LWda8jOaPsUDNbQ",
+      authDomain: "dlt-website-3a5ba.firebaseapp.com",
+      projectId: "dlt-website-3a5ba",
+      storageBucket: "dlt-website-3a5ba.firebasestorage.app",
+      messagingSenderId: "469477861527",
+      appId: "1:469477861527:web:c79c348dcd788ff188a1d2",
+      measurementId: "G-F5C9RSSXKM"
+    };
+
+    const firebaseReady = !!(window.firebase && firebaseConfig.apiKey && firebaseConfig.projectId);
+    let auth = null;
+    let db = null;
+    let feedUnsub = null;
+
+    if (firebaseReady) {
+      firebase.initializeApp(firebaseConfig);
+      auth = firebase.auth();
+      db = firebase.firestore();
+    }
+
+    const $ = (id) => document.getElementById(id);
+
+    let currentUser = null;
+    let profilePicData = "";
+    let filter = "all";
+    let feedPosts = [];
+
+    function uid(){
+      return "u_" + Math.random().toString(36).slice(2,10) + "_" + Date.now();
+    }
+
+    function escapeHtml(text){
+      return String(text)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#39;");
+    }
+
+    function timeString(val){
+      if (!val) return "just now";
+      let d = null;
+      if (typeof val.toDate === "function") d = val.toDate();
+      else if (typeof val.seconds === "number") d = new Date(val.seconds * 1000);
+      else d = new Date(val);
+      if (isNaN(d.getTime())) return "just now";
+      return d.toLocaleString();
+    }
+
+    function show(view){
+      $("homeView").classList.add("hidden");
+      $("feedView").classList.add("hidden");
+      $(view).classList.remove("hidden");
+    }
+
+    function setButtonState(){
+      const signed = !!currentUser;
+      $("signinBtn").classList.toggle("hidden", signed);
+      $("signoutBtn").classList.toggle("hidden", !signed);
+    }
+
+    function defaultAvatarLetter(name){
+      const n = (name || "A").trim();
+      return n ? n[0].toUpperCase() : "A";
+    }
+
+    function renderProfile(){
+      if (!currentUser){
+        $("profileAvatar").innerHTML = "A";
+        $("profileName").textContent = "Not signed in";
+        $("profileEmail").textContent = "Use Google Sign-In to start.";
+        $("displayNameInput").value = "";
+        $("bioInput").value = "";
+        $("myLinkBox").textContent = "Signin with google first.";
+        return;
+      }
+
+      $("profileName").textContent = currentUser.displayName || "User";
+      $("profileEmail").textContent = currentUser.email || "";
+      $("displayNameInput").value = currentUser.displayName || "";
+      $("myLinkBox").textContent = location.origin + location.pathname + "?uid=" + currentUser.uid;
+
+      if (profilePicData) {
+        $("profileAvatar").innerHTML = '<img src="' + profilePicData + '" alt="profile">';
+      } else if (currentUser.photoURL) {
+        $("profileAvatar").innerHTML = '<img src="' + currentUser.photoURL + '" alt="profile">';
+      } else {
+        $("profileAvatar").textContent = defaultAvatarLetter(currentUser.displayName);
+      }
+    }
+
+    function renderFeed(){
+      const list = $("feedList");
+      if (!currentUser){
+        list.innerHTML = '<div class="empty">Sign in first to see the feed and post.</div>';
+        return;
+      }
+
+      let items = feedPosts.slice();
+
+      if (filter !== "all"){
+        items = items.filter(p => p.category === filter);
+      }
+
+      if (!items.length){
+        list.innerHTML = '<div class="empty">No posts yet in this category.</div>';
+        return;
+      }
+
+      list.innerHTML = items.map(post => {
+        const anon = !!post.anonymous;
+        const name = anon ? "Anonymous" : (post.displayName || "User");
+        const pic = anon ? "" : (post.photoURL || "");
+        const avatarHtml = pic
+          ? `<img src="${escapeHtml(pic)}" alt="avatar">`
+          : `<span>${escapeHtml(defaultAvatarLetter(name))}</span>`;
+
+        return `
+          <div class="post">
+            <div class="post-top">
+              <div class="post-user">
+                <div class="avatar">${avatarHtml}</div>
+                <div style="min-width:0;">
+                  <div style="font-weight:800; line-height:1.2;">${escapeHtml(name)}</div>
+                  <div class="small">${escapeHtml(post.style || "Normal")} • ${timeString(post.createdAt)}</div>
+                </div>
+              </div>
+              <span class="badge">${escapeHtml(post.category || "General")}</span>
+            </div>
+            <p style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(post.text || "")}</p>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function loadLocalProfile(){
+      if (!currentUser) return;
+      const raw = localStorage.getItem("amber_profile_" + currentUser.uid);
+      if (!raw) return;
+      try{
+        const p = JSON.parse(raw);
+        profilePicData = p.photoURL || "";
+        $("displayNameInput").value = p.displayName || currentUser.displayName || "";
+        $("bioInput").value = p.bio || "";
+      }catch(e){}
+    }
+
+    function saveLocalProfile(data){
+      if (!currentUser) return;
+      localStorage.setItem("amber_profile_" + currentUser.uid, JSON.stringify(data));
+    }
+
+    function loadLocalFeed(){
+      try{
+        feedPosts = JSON.parse(localStorage.getItem("amber_posts") || "[]");
+      }catch(e){
+        feedPosts = [];
+      }
+      renderFeed();
+    }
+
+    function saveLocalFeed(){
+      localStorage.setItem("amber_posts", JSON.stringify(feedPosts));
+    }
+
+    function attachFeedListener(){
+      if (!firebaseReady || !currentUser) return;
+
+      if (feedUnsub) feedUnsub();
+      feedUnsub = db.collection("posts")
+        .orderBy("createdAt", "desc")
+        .onSnapshot((snap) => {
+          feedPosts = [];
+          snap.forEach(doc => feedPosts.push(doc.data()));
+          renderFeed();
+        }, () => {
+          renderFeed();
+        });
+    }
+
+    function readFileAsDataURL(file){
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function signIn(){
+      if (!firebaseReady){
+        alert("Firebase is not ready.");
+        return;
+      }
+
+      try{
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: "select_account" });
+        const result = await auth.signInWithPopup(provider);
+        currentUser = result.user;
+        renderProfile();
+        setButtonState();
+        show("homeView");
+
+        if (firebaseReady){
+          const profileDoc = await db.collection("users").doc(currentUser.uid).get();
+          if (profileDoc.exists){
+            const data = profileDoc.data();
+            profilePicData = data.photoURL || "";
+            $("bioInput").value = data.bio || "";
+            $("displayNameInput").value = data.displayName || currentUser.displayName || "";
+          }else{
+            profilePicData = currentUser.photoURL || "";
+          }
+          renderProfile();
+          attachFeedListener();
+        } else {
+          loadLocalProfile();
+          loadLocalFeed();
+        }
+      }catch(err){
+        alert("Sign in failed: " + err.message);
+      }
+    }
+
+    async function signOutUser(){
+      if (!firebaseReady) return;
+      await auth.signOut();
+    }
+
+    async function saveProfile(){
+      if (!currentUser){
+        alert("Sign in first.");
+        return;
+      }
+
+      const displayName = $("displayNameInput").value.trim() || currentUser.displayName || "User";
+      const bio = $("bioInput").value.trim();
+
+      const file = $("photoInput").files[0];
+      if (file){
+        profilePicData = await readFileAsDataURL(file);
+      }
+
+      const photoURL = profilePicData || currentUser.photoURL || "";
+
+      const payload = {
+        uid: currentUser.uid,
+        displayName,
+        bio,
+        photoURL,
+        updatedAt: Date.now()
+      };
+
+      if (firebaseReady){
+        await db.collection("users").doc(currentUser.uid).set({
+          displayName,
+          bio,
+          photoURL,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      }else{
+        saveLocalProfile(payload);
+      }
+
+      currentUser = {
+        ...currentUser,
+        displayName,
+        photoURL
+      };
+
+      renderProfile();
+      alert("Profile saved.");
+    }
+
+    async function publishPost(){
+      if (!currentUser){
+        alert("Sign in first.");
+        return;
+      }
+
+      const text = $("postText").value.trim();
+      if (!text){
+        alert("Write a post first.");
+        return;
+      }
+
+      const post = {
+        id: uid(),
+        uid: currentUser.uid,
+        displayName: $("anonymousCheck").checked ? "" : (currentUser.displayName || $("displayNameInput").value.trim() || "User"),
+        photoURL: $("anonymousCheck").checked ? "" : (profilePicData || currentUser.photoURL || ""),
+        anonymous: $("anonymousCheck").checked,
+        text,
+        category: $("postCategory").value,
+        style: $("postStyle").value,
+        createdAt: Date.now()
+      };
+
+      if (firebaseReady){
+        await db.collection("posts").add(post);
+      }else{
+        feedPosts.unshift(post);
+        saveLocalFeed();
+        renderFeed();
+      }
+
+      $("postText").value = "";
+      $("anonymousCheck").checked = false;
+      alert("Post published.");
+    }
+
+    $("signinBtn").onclick = signIn;
+    $("signoutBtn").onclick = signOutUser;
+    $("saveProfileBtn").onclick = saveProfile;
+    $("publishBtn").onclick = publishPost;
+    $("copyMyLinkBtn").onclick = async () => {
+      if (!currentUser){
+        alert("Sign in first.");
+        return;
+      }
+      await navigator.clipboard.writeText(location.origin + location.pathname + "?uid=" + currentUser.uid);
+      alert("Link copied.");
+    };
+    $("homeBtn").onclick = () => show("homeView");
+    $("feedBtn").onclick = () => {
+      if (!currentUser){
+        alert("Sign in first.");
+        return;
+      }
+      show("feedView");
+      renderFeed();
+    };
+    $("refreshBtn").onclick = () => {
+      if (firebaseReady && currentUser) attachFeedListener();
+      else loadLocalFeed();
+    };
+
+    $("categoryTabs").addEventListener("click", (e) => {
+      const btn = e.target.closest(".chip");
+      if (!btn) return;
+      filter = btn.dataset.filter;
+      document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+      btn.classList.add("active");
+      renderFeed();
+    });
+
+    $("photoInput").addEventListener("change", async () => {
+      const file = $("photoInput").files[0];
+      if (!file) return;
+      profilePicData = await readFileAsDataURL(file);
+      renderProfile();
+    });
+
+    $("displayNameInput").addEventListener("input", () => {
+      if (currentUser){
+        $("profileName").textContent = $("displayNameInput").value.trim() || currentUser.displayName || "User";
+      }
+    });
+
+    if (firebaseReady){
+      auth.onAuthStateChanged(async (user) => {
+        currentUser = user;
+        setButtonState();
+
+        if (user){
+          const docSnap = await db.collection("users").doc(user.uid).get();
+          if (docSnap.exists){
+            const data = docSnap.data();
+            profilePicData = data.photoURL || "";
+            $("bioInput").value = data.bio || "";
+            $("displayNameInput").value = data.displayName || user.displayName || "";
+          }else{
+            profilePicData = user.photoURL || "";
+            $("displayNameInput").value = user.displayName || "";
+            $("bioInput").value = "";
+          }
+
+          renderProfile();
+          attachFeedListener();
+          show("homeView");
+        }else{
+          currentUser = null;
+          profilePicData = "";
+          feedPosts = [];
+          if (feedUnsub) feedUnsub();
+          renderProfile();
+          renderFeed();
+          show("homeView");
+        }
+      });
+    }else{
+      show("homeView");
+      renderFeed();
+    }
+
+    window.addEventListener("storage", () => {
+      if (!firebaseReady){
+        loadLocalFeed();
+      }
+    });
+
+    renderProfile();
+    setButtonState();
+    renderFeed();
+  </script>
+</body>
+</html>
